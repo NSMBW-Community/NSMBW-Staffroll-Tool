@@ -1,9 +1,10 @@
 NSMBW Staffroll Tool
 ====================
 
-This tool converts New Super Mario Bros. Wii's staffroll.bin to/ from a custom
+This tool converts New Super Mario Bros. Wii's staffroll.bin to/from a custom
 text file format. It's backward-compatible with text files produced by Treeki's
-Staffroll Editor tool, though some new things have also been introduced.
+(Ninji's) Staffroll Editor tool, though some new things have also been
+introduced.
 
 Requires a reasonably recent version of Python 3. (Tested with 3.6.)
 
@@ -16,16 +17,20 @@ CLI
     python3 staffroll.py [-h] [--type {bin,txt}] [--dont-abbr-indents] in_file [out_file]
 
 * -h: display help information
-* --type bin, --type txt: the input file type (binary format or text format). If not specified, the tool will make an educated guess based on the file contents.
-* --dont-abbr-indents: when converting to text format, the tool will by default omit indentation values when they match the auto-calculated optimal indentation value for centering. If this option is specified, however, indentation levels will always be explicit in the output file.
+* --type bin, --type txt: the input file type (binary format or text format).
+  If not specified, the tool will make an educated guess based on the file
+  contents.
+* --dont-abbr-indents: when converting to text format, the tool will by default
+  omit indentation values when they match the auto-calculated optimal
+  indentation value for centering. If this option is specified, however,
+  indentation levels will always be explicit in the output file.
 * in_file: the input file
-* out_file: the output file. If not specified, defaults to in_file plus either ".bin" or ".txt" depending on the output format.
+* out_file: the output file. If not specified, defaults to in_file plus either
+  ".bin" or ".txt" depending on the output format.
 
 
-Text file format overview
--------------------------
-
-Example:
+Example
+-------
 
     :<bold>PLAYTESTING</bold>
     :RoadrunnerWMC
@@ -47,6 +52,13 @@ Example:
     :<copyrights>
 
 
+![Example](https://raw.githubusercontent.com/RoadrunnerWMC/nsmbw-staffroll-tool/master/example_for_readme.png)
+
+
+Text file format overview
+-------------------------
+
+
 Blank lines in the file represent blank lines in-game. It's recommended to use
 3 blank lines between each block of credits text.
 
@@ -55,10 +67,20 @@ For non-blank lines, the format is
     indent:text
 
 where indent is a non-negative integer that represents the amount of
-indentation, measured in blocks from some position on the left (the left edge
-of the screen, maybe?). If you leave the value out, the tool will automatically
-calculate the correct indentation for centering. (The formula is
-`15 - floor(length(text) / 2)`.)
+indentation, measured in blocks from the left edge of the screen.
+
+Some notes about indentation:
+
+* If the left edge of the screen moves around, the rows of blocks won't line up
+  with each other, so be sure to keep the camera completely stationary like it
+  is in the original credits level.
+* At the zoom level used in the original credits level, the screen is about 31
+  blocks wide. Thus, the formula Nintendo used for calculating the indentation
+  for each line is `15 - floor(length(text) / 2)`.
+* If you leave the explicit indentation value out (for example, `:Text here`),
+  the tool will use that formula to automatically calculate the correct
+  indentation.
+
 
 Tags
 ----
