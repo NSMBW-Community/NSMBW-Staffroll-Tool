@@ -6,7 +6,7 @@ text file format. It's backward-compatible with text files produced by Treeki's
 (Ninji's) Staffroll Editor tool, though some new things have also been
 introduced.
 
-Requires a reasonably recent version of Python 3. (Tested with 3.6.)
+Requires a reasonably recent version of Python 3. (Tested with 3.8.)
 
 staffroll_lib.py can be imported as a standalone Python module, too.
 
@@ -16,17 +16,17 @@ CLI
 
     python3 staffroll.py [-h] [--type {bin,txt}] [--dont-abbr-indents] in_file [out_file]
 
-* -h: display help information
-* --type bin, --type txt: the input file type (binary format or text format).
-  If not specified, the tool will make an educated guess based on the file
-  contents.
-* --dont-abbr-indents: when converting to text format, the tool will by default
-  omit indentation values when they match the auto-calculated optimal
+* `-h`: display help information
+* `--type bin`, `--type txt`: the input file type (binary format or text
+  format). If not specified, the tool will make an educated guess based on the
+  file contents.
+* `--dont-abbr-indents`: when converting to text format, the tool will by
+  default omit indentation values when they match the auto-calculated optimal
   indentation value for centering. If this option is specified, however,
   indentation levels will always be explicit in the output file.
-* in_file: the input file
-* out_file: the output file. If not specified, defaults to in_file plus either
-  ".bin" or ".txt" depending on the output format.
+* `in_file`: the input file
+* `out_file`: the output file. If not specified, defaults to in_file plus
+  either ".bin" or ".txt" depending on the output format.
 
 
 Example
@@ -55,19 +55,31 @@ Example
 ![Example](https://raw.githubusercontent.com/RoadrunnerWMC/nsmbw-staffroll-tool/master/example_for_readme.png)
 
 
+Where is staffroll.bin?
+-----------------------
+
+There's a different one for each language the game supports. The English
+staffroll.bin in North American builds of the game, for example, is at
+`/US/EngUS/staffroll/staffroll.bin`. In European builds, it's
+`/EU/EngEU/staffroll/staffroll.bin`. For other languages, pick a different
+second-level folder, of course.
+
+
 Text file format overview
 -------------------------
 
-
 Blank lines in the file represent blank lines in-game. It's recommended to use
-3 blank lines between each block of credits text.
+3 blank lines between each section of credits text. Nintendo did it that way,
+and it leaves plenty of room for the players to jump around between the
+sections.
 
 For non-blank lines, the format is
 
     indent:text
 
-where indent is a non-negative integer that represents the amount of
-indentation, measured in blocks from the left edge of the screen.
+where indent is an optional non-negative integer that represents the amount of
+indentation, measured in blocks from the left edge of the screen. Leaving the
+indent blank is recommended.
 
 Some notes about indentation:
 
