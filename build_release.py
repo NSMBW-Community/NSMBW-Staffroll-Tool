@@ -216,6 +216,9 @@ if sys.platform == 'darwin':
 else:
     dest_folder = DIR
 
+if not os.path.isdir(dest_folder):
+    os.makedirs(dest_folder)
+
 for f in config.DATA_FOLDERS:
     if os.path.isdir(os.path.join(dest_folder, f)):
         shutil.rmtree(os.path.join(dest_folder, f))
