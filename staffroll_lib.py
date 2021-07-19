@@ -395,7 +395,7 @@ class StaffrollLine:
         on the text contents of the line.
         """
         # TODO: should this use .num_chars or .num_chars_and_copyrights?
-        return 15 - self.num_chars // 2
+        return max(0, 15 - self.num_chars // 2)
 
 
     def __str__(self):
