@@ -153,7 +153,10 @@ class StaffrollLine:
         Write this line to the provided binary file object
         """
 
-        f.write(struct.pack('>II', self.indent, self.num_chars_and_copyrights))
+        if self.indent < 0:
+            print(f'WARNING: Line "{str(self)}" has negative offset (auto-clamping to 0)')
+
+        f.write(struct.pack('>II', max(0, self.indent), self.num_chars_and_copyrights))
 
         # Need to keep track of these so we know what metadata to set on
         # each character
