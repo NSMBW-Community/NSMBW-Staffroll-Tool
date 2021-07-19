@@ -76,7 +76,7 @@ print('>>')
 
 # Excludes
 excludes = ['calendar', 'datetime', 'difflib', 'doctest', 'inspect',
-    'locale', 'multiprocessing', 'optpath', 'os2emxpath', 'pdb',
+    'multiprocessing', 'optpath', 'os2emxpath', 'pdb',
     'socket', 'ssl', 'unittest',
     'FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter',
     'select', 'threading', 'hashlib']
