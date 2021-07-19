@@ -8,7 +8,7 @@ MAC_BUNDLE_IDENTIFIER = 'roadrunnerwmc.nsmbwstaffrolltool'
 
 SCRIPT_FILE = 'staffroll.py'
 DATA_FOLDERS = []
-DATA_FILES = ['readme.md', 'license.txt']
+DATA_FILES = ['README.md', 'LICENSE']
 EXTRA_IMPORT_PATHS = []
 
 # macOS only
