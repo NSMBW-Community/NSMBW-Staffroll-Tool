@@ -106,7 +106,7 @@ class StaffrollLine:
 
             else:
                 new_bold     = char_data & 0x10000000
-                new_contents = Contents(char_data & 0xF)
+                new_contents = Contents(min(max(Contents), char_data & 0xF))
 
                 # Insert a tag if anything changed
                 if new_bold and not bold:
