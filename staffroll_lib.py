@@ -180,6 +180,10 @@ class StaffrollLine:
                 contents = Contents.RANDOM
             else: # string instance
                 for c in part:
+                    if ord(c) < 32:
+                        # skip any control characters the format doesn't support
+                        continue
+
                     cval = (ord(c) - 32) << 4
                     if bold: cval |= 0x10000000
                     cval |= contents
