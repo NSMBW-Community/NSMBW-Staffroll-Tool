@@ -152,6 +152,7 @@ class StaffrollLine:
         """
         Write this line to the provided binary file object
         """
+        self.delete_unrepresentable_chars()
 
         if self.indent < 0:
             print(f'WARNING: Line "{str(self)}" has negative offset (auto-clamping to 0)')
@@ -180,10 +181,6 @@ class StaffrollLine:
                 contents = Contents.RANDOM
             else: # string instance
                 for c in part:
-                    if ord(c) < 32:
-                        # skip any control characters the format doesn't support
-                        continue
-
                     cval = (ord(c) - 32) << 4
                     if bold: cval |= 0x10000000
                     cval |= contents
@@ -364,6 +361,15 @@ class StaffrollLine:
             t.append('</unbreakable>')
 
         return ''.join(t)
+
+
+    def delete_unrepresentable_chars(self):
+        """
+        Delete unrepresentable characters in all strings (byte value < 32)
+        """
+        for i, p in enumerate(self.parts):
+            if isinstance(p, str):
+                self.parts[i] = ''.join(c for c in p if ord(c) >= 32)
 
 
     @property
