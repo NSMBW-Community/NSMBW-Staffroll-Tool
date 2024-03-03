@@ -35,8 +35,8 @@ class Tag(enum.Enum):
     An enum representing tags in the text file. 
     """
     COPYRIGHT = '<copyrights>'
-    BEGIN_BOLD = '<bold>'
-    END_BOLD = '</bold>'
+    BEGIN_YELLOW = '<yellow>'
+    END_YELLOW = '</yellow>'
     BEGIN_FORCE_COIN = '<coin>'
     END_FORCE_COIN = '</coin>'
     BEGIN_NO_COIN = '<no_coin>'
@@ -48,11 +48,19 @@ class Tag(enum.Enum):
     def is_end(self):
         return self in END_TAGS
 
+    def get_all_spellings(self):
+        spellings = {self.value}
+        if self is Tag.BEGIN_YELLOW:
+            spellings.add('<bold>')
+        elif self is Tag.END_YELLOW:
+            spellings.add('</bold>')
+        return spellings
+
     def __str__(self):
         return self.value
     __repr__ = __str__
 
-END_TAGS = set([Tag.END_BOLD, Tag.END_FORCE_COIN, Tag.END_NO_COIN, Tag.END_UNBREAKABLE])
+END_TAGS = set([Tag.END_YELLOW, Tag.END_FORCE_COIN, Tag.END_NO_COIN, Tag.END_UNBREAKABLE])
 
 
 
@@ -81,7 +89,7 @@ class StaffrollLine:
         # of the current text formatting state at all times, so we can
         # recognize changes and insert tags appropriately.
         parts = []
-        bold = False
+        yellow = False
         contents = Contents.RANDOM
 
         # current_str is a list of character codepoints
@@ -105,16 +113,16 @@ class StaffrollLine:
                 parts.append(Tag.COPYRIGHT)
 
             else:
-                new_bold     = char_data & 0x10000000
+                new_yellow   = char_data & 0x10000000
                 new_contents = Contents(min(max(Contents), char_data & 0xF))
 
                 # Insert a tag if anything changed
-                if new_bold and not bold:
+                if new_yellow and not yellow:
                     flush_current_str()
-                    parts.append(Tag.BEGIN_BOLD)
-                elif bold and not new_bold:
+                    parts.append(Tag.BEGIN_YELLOW)
+                elif yellow and not new_yellow:
                     flush_current_str()
-                    parts.append(Tag.END_BOLD)
+                    parts.append(Tag.END_YELLOW)
 
                 if new_contents != contents:
                     flush_current_str()
@@ -140,7 +148,7 @@ class StaffrollLine:
 
                 # Keep track of the new character formatting options for
                 # next time
-                bold, contents = new_bold, new_contents
+                yellow, contents = new_yellow, new_contents
 
         # Flush any remaining text data
         flush_current_str()
@@ -161,16 +169,16 @@ class StaffrollLine:
 
         # Need to keep track of these so we know what metadata to set on
         # each character
-        bold = False
+        yellow = False
         contents = Contents.RANDOM
 
         for part in self.parts:
             if part == Tag.COPYRIGHT:
                 f.write(b'\x20\0\0\0')
-            elif part == Tag.BEGIN_BOLD:
-                bold = True
-            elif part == Tag.END_BOLD:
-                bold = False
+            elif part == Tag.BEGIN_YELLOW:
+                yellow = True
+            elif part == Tag.END_YELLOW:
+                yellow = False
             elif part == Tag.BEGIN_FORCE_COIN:
                 contents = Contents.FORCE_COIN
             elif part == Tag.BEGIN_NO_COIN:
@@ -182,7 +190,7 @@ class StaffrollLine:
             else: # string instance
                 for c in part:
                     cval = (ord(c) - 32) << 4
-                    if bold: cval |= 0x10000000
+                    if yellow: cval |= 0x10000000
                     cval |= contents
 
                     f.write(struct.pack('>I', cval))
@@ -211,23 +219,17 @@ class StaffrollLine:
             Iterate over the line string and yield strings and Tags
             appropriately
             """
-            def find_all(tag):
-                """
-                Return a set of all indices where tag appears in raw_line.
-                Case-insensitive.
-                """
-                tag = tag.upper()
-
-                items = set()
-                idx = raw_line.upper().find(tag)
-                while idx >= 0:
-                    items.add(idx)
-                    idx = raw_line.upper().find(tag, idx + 1)
-
-                return items
+            tag_idxs = {}  # {idx: (Tag, string length)}
 
             # Find every instance of every Tag in raw_line
-            tag_idxs = {tag: find_all(tag.value) for tag in Tag}
+            for tag in Tag:
+                for spelling in tag.get_all_spellings():
+                    spelling = spelling.upper()
+
+                    idx = raw_line.upper().find(spelling)
+                    while idx >= 0:
+                        tag_idxs[idx] = (tag, len(spelling))
+                        idx = raw_line.upper().find(spelling, idx + 1)
 
             # List containing the in-progress string
             # (list of characters)
@@ -235,20 +237,19 @@ class StaffrollLine:
 
             idx = 0
             while idx < len(raw_line):
-                for tag in Tag:
-                    if idx in tag_idxs[tag]:
-                        # There's a tag that starts at this index!
+                if idx in tag_idxs:
+                    # There's a tag that starts at this index!
+                    tag, tag_len_chars = tag_idxs[idx]
 
-                        # Yield (flush) the string up to this point
-                        if current_str:
-                            yield ''.join(current_str)
-                            current_str.clear()
+                    # Yield (flush) the string up to this point
+                    if current_str:
+                        yield ''.join(current_str)
+                        current_str.clear()
 
-                        # Yield the appropriate command, and skip past
-                        # the tag contents
-                        yield tag
-                        idx += len(tag.value)
-                        break
+                    # Yield the appropriate command, and skip past
+                    # the tag contents
+                    yield tag
+                    idx += tag_len_chars
 
                 else:
                     # No tag at this location, so just add the character
@@ -294,7 +295,7 @@ class StaffrollLine:
 
         # Keep track of these, so we can figure out when these states
         # actually change
-        bold = False
+        yellow = False
         contents = Contents.RANDOM
 
         for part in self.parts:
@@ -304,12 +305,12 @@ class StaffrollLine:
                 if part == Tag.COPYRIGHT:
                     t.append('<Copyrights>')
 
-                elif part == Tag.BEGIN_BOLD and not bold:
-                    t.append('<bold>')
-                    bold = True
-                elif part == Tag.END_BOLD and bold:
-                    t.append('</bold>')
-                    bold = False
+                elif part == Tag.BEGIN_YELLOW and not yellow:
+                    t.append('<yellow>')
+                    yellow = True
+                elif part == Tag.END_YELLOW and yellow:
+                    t.append('</yellow>')
+                    yellow = False
 
                 else:
                     # Contents tag.
@@ -350,8 +351,8 @@ class StaffrollLine:
                 t.append(part)
 
         # Add closing tags if required
-        if bold:
-            t.append('</bold>')
+        if yellow:
+            t.append('</yellow>')
 
         if contents == Contents.FORCE_COIN:
             t.append('</coin>')

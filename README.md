@@ -32,19 +32,19 @@ CLI
 Example
 -------
 
-    :<bold>PLAYTESTING</bold>
+    :<yellow>PLAYTESTING</yellow>
     :RoadrunnerWMC
     :Skawo
     :Other People
 
 
 
-    :<bold>GENERAL PRODUCER</bold>
+    :<yellow>GENERAL PRODUCER</yellow>
     :RoadrunnerWMC
 
 
 
-    :<bold>AND OF COURSE</bold>
+    :<yellow>AND OF COURSE</yellow>
     :<coin>Original Nintendo Staff</coin>
 
 
@@ -108,13 +108,13 @@ inserts the copyright text (which is not made of brick blocks). Despite how it
 looks, this tag is self-closing; it essentially just represents a special
 character in the binary file.
 
-### Bold tag
+### Yellow tag
 
-    <bold>Bold text</bold>
+    <yellow>Yellow text</yellow>
 
-causes the text between the tags to be drawn in a yellow font (used in section
-headers). The tag name is `<bold>` only for backward-compatibility; this option
-does not actually affect font weight.
+causes the text between the tags to be drawn in a yellow font (used for section
+headers). The name "`<bold>`" is also accepted for backward-compatibility with
+Staffroll Editor, even though this option does not actually affect font weight.
 
 ### Contents tags
 
@@ -132,7 +132,7 @@ greater than 2. Values higher than 3 are not supported by this tool, since they
 seem rather useless.
 
 Contents tags cannot be nested within each other (though they can be
-nested with `<bold>` tags). Behavior is undefined if you try it.
+nested with `<yellow>` tags). Behavior is undefined if you try it.
 
 Value 0 is used for any text not enclosed by contents tags.
 
